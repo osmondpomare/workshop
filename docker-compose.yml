@@ -1,0 +1,67 @@
+name: workshop-bintec
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: wks-postgres
+    environment:
+      POSTGRES_DB: workshop
+      POSTGRES_USER: workshop
+      POSTGRES_PASSWORD: workshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U workshop -d workshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  localstack:
+    image: localstack/localstack:4.4.0
+    container_name: wks-localstack
+    environment:
+      SERVICES: dynamodb
+      AWS_DEFAULT_REGION: us-east-1
+      LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:-}
+    ports:
+      - "4566:4566"
+    volumes:
+      - ./infra/localstack/init-dynamodb.sh:/etc/localstack/init/ready.d/init-dynamodb.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "awslocal dynamodb describe-table --table-name BCO_REVERSAL_EVENTS --region us-east-1 > /dev/null"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
+
+  bco-wks-901:
+    build:
+      context: .
+      dockerfile: BCO-WorkshopServices.901/Dockerfile
+    image: bco-workshop-services-901:1.0.0
+    container_name: wks-bco-901
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: workshop
+      DB_USER: workshop
+      DB_PASSWORD: workshop
+      DYNAMO_ENDPOINT: http://localstack:4566
+      DYNAMO_REVERSAL_TABLE: BCO_REVERSAL_EVENTS
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      EXCHANGE_RATE_BASE_URL: https://open.er-api.com
+      APP_USER: wsuser
+      APP_PASSWORD: wspassword
+      CURRENT_USER: Nequi
+      TRACER_DEBUG_ENABLED: "false"
+    ports:
+      - "9080:9080"
+      - "9443:9443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy

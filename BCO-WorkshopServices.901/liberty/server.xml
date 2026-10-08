@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="BCO.WorkshopServices.901">
+
+	<featureManager>
+		<feature>javaee-7.0</feature>
+		<feature>wasJmsServer-1.0</feature>
+		<feature>transportSecurity-1.0</feature>
+	</featureManager>
+
+	<variable name="DB_HOST" defaultValue="localhost" />
+	<variable name="DB_PORT" defaultValue="5432" />
+	<variable name="DB_NAME" defaultValue="workshop" />
+	<variable name="DB_USER" defaultValue="workshop" />
+	<variable name="DB_PASSWORD" defaultValue="workshop" />
+	<variable name="APP_USER" defaultValue="wsuser" />
+	<variable name="APP_PASSWORD" defaultValue="wspassword" />
+	<variable name="KEYSTORE_PASSWORD" defaultValue="workshopKeystore" />
+
+	<httpEndpoint id="defaultHttpEndpoint" host="*" httpPort="9080" httpsPort="9443" />
+
+	<keyStore id="defaultKeyStore" password="${KEYSTORE_PASSWORD}" />
+
+	<basicRegistry id="basic" realm="WorkshopRealm">
+		<user name="${APP_USER}" password="${APP_PASSWORD}" />
+		<group name="wasappusers">
+			<member name="${APP_USER}" />
+		</group>
+	</basicRegistry>
+
+	<library id="PostgresLib">
+		<fileset dir="${shared.resource.dir}/jdbc" includes="*.jar" />
+	</library>
+
+	<dataSource id="WorkshopDS" jndiName="jdbc/WorkshopDS">
+		<jdbcDriver libraryRef="PostgresLib" />
+		<properties.postgresql serverName="${DB_HOST}" portNumber="${DB_PORT}" databaseName="${DB_NAME}" user="${DB_USER}" password="${DB_PASSWORD}" />
+		<connectionManager maxPoolSize="10" minPoolSize="1" />
+	</dataSource>
+
+	<messagingEngine id="defaultME">
+		<queue id="BCO.NotifyReversal.Q" maxRedeliveryCount="5" />
+	</messagingEngine>
+
+	<jmsQueueConnectionFactory id="WKS-CF" jndiName="jms/WKS-CF">
+		<properties.wasJms />
+	</jmsQueueConnectionFactory>
+
+	<jmsQueue id="BCO-NotifyReversal.Q" jndiName="jms/BCO-NotifyReversal.Q">
+		<properties.wasJms queueName="BCO.NotifyReversal.Q" />
+	</jmsQueue>
+
+	<jmsActivationSpec id="BCO.WorkshopServices.901/BCO.WKS.901.SEC/MdbNotifyReversalBean">
+		<properties.wasJms destinationRef="BCO-NotifyReversal.Q" destinationType="javax.jms.Queue" maxConcurrency="5" />
+	</jmsActivationSpec>
+
+	<enterpriseApplication id="BCO.WorkshopServices.901" name="BCO.WorkshopServices.901" location="BCO.WorkshopServices.901.ear">
+		<application-bnd>
+			<security-role name="wasappusers">
+				<group name="wasappusers" />
+			</security-role>
+		</application-bnd>
+	</enterpriseApplication>
+
+	<transaction totalTranLifetimeTimeout="60s" />
+
+	<logging consoleLogLevel="INFO" consoleFormat="simple" />
+
+</server>

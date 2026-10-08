@@ -1,0 +1,24 @@
+{
+  "requestMessage": {
+    "header": {
+      "channel": "MF-001",
+      "messageId": "MSG-0001",
+      "clientId": "3001234567",
+      "destination": {
+        "serviceName": "ReversalServices",
+        "serviceOperation": "registerReversal",
+        "serviceRegion": "C001",
+        "serviceVersion": "1.0.0"
+      }
+    },
+    "body": {
+      "registerReversalRQ": {
+        "transactionId": "TX-1001",
+        "phoneNumber": "3001234567",
+        "amount": "25.50",
+        "currency": "USD",
+        "reason": "Transfer rejected by provider"
+      }
+    }
+  }
+}

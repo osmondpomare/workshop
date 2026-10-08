@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/ejb-jar_3_2.xsd" version="3.2">
+	<module-name>BCO.WKS.901.SEC</module-name>
+	<display-name>BCO.WKS.901.SEC</display-name>
+	<enterprise-beans>
+		<session>
+			<ejb-name>GenericSendJMSMesssageBean</ejb-name>
+			<local-bean />
+			<ejb-class>com.nequi.bco.wks901.sec.bean.GenericSendJMSMesssageBean</ejb-class>
+			<session-type>Stateless</session-type>
+			<transaction-type>Container</transaction-type>
+			<resource-ref>
+				<res-ref-name>jms/WKS-CF</res-ref-name>
+				<res-type>javax.jms.QueueConnectionFactory</res-type>
+				<res-auth>Container</res-auth>
+				<res-sharing-scope>Shareable</res-sharing-scope>
+				<lookup-name>jms/WKS-CF</lookup-name>
+			</resource-ref>
+			<resource-env-ref>
+				<resource-env-ref-name>jms/BCO-NotifyReversal.Q</resource-env-ref-name>
+				<resource-env-ref-type>javax.jms.Queue</resource-env-ref-type>
+				<lookup-name>jms/BCO-NotifyReversal.Q</lookup-name>
+			</resource-env-ref>
+		</session>
+	</enterprise-beans>
+</ejb-jar>

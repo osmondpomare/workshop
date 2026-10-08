@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="WebApp_ID" version="3.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+	<display-name>BCO.WKS.901.SEF</display-name>
+	<servlet>
+		<servlet-name>com.nequi.bco.wks901.sef.config.ConfigServices</servlet-name>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>com.nequi.bco.wks901.sef.config.ConfigServices</servlet-name>
+		<url-pattern>/rest/*</url-pattern>
+	</servlet-mapping>
+	<security-constraint>
+		<display-name>BCO.WKS.901 Reversal Services</display-name>
+		<web-resource-collection>
+			<web-resource-name>BCO.WKS.901 Reversal Services</web-resource-name>
+			<url-pattern>/rest/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>wasappusers</role-name>
+		</auth-constraint>
+	</security-constraint>
+	<login-config>
+		<auth-method>BASIC</auth-method>
+		<realm-name>WorkshopRealm</realm-name>
+	</login-config>
+	<security-role>
+		<description>BCO.WKS.901 application users</description>
+		<role-name>wasappusers</role-name>
+	</security-role>
+</web-app>

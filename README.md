@@ -192,6 +192,7 @@ The EAR is written to `BCO-WorkshopServices.901/BCO.WKS.901.EAR/target/BCO.Works
 
 - **LocalStack asks for an auth token.** Since March 2026 the `latest` LocalStack image requires an account. The compose file pins `localstack/localstack:4.4.0`. If your environment still asks for a token, export `LOCALSTACK_AUTH_TOKEN` before `docker compose up`.
 - **The exchange-rate API is unreachable.** Point `EXCHANGE_RATE_BASE_URL` at any service that answers `GET /v6/latest/{currency}` with `{"result":"success","rates":{"COP":...}}`, or send `"currency":"COP"` (rate 1, no outbound call).
+- **SSL handshake failure calling the exchange-rate API.** When Liberty's SSL features are enabled, Liberty replaces the JVM default trust store with `defaultKeyStore`. `server.xml` sets `trustDefaultCerts="true"` on `defaultSSLConfig` so outbound calls also trust the JDK `cacerts`. If your network inspects TLS with a corporate certificate, add that CA to the trust store or point `EXCHANGE_RATE_BASE_URL` to a reachable mock.
 - **Port already in use.** Change the published ports in `docker-compose.yml` (`5432`, `4566`, `9080`, `9443`).
 - **The MDB is not consuming.** The `jmsActivationSpec` id in `server.xml` must match `<application>/<ejb-module>/<bean>`: `BCO.WorkshopServices.901/BCO.WKS.901.SEC/MdbNotifyReversalBean`.
 

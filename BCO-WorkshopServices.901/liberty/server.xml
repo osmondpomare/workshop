@@ -20,6 +20,8 @@
 
 	<keyStore id="defaultKeyStore" password="${KEYSTORE_PASSWORD}" />
 
+	<ssl id="defaultSSLConfig" keyStoreRef="defaultKeyStore" trustDefaultCerts="true" />
+
 	<basicRegistry id="basic" realm="WorkshopRealm">
 		<user name="${APP_USER}" password="${APP_PASSWORD}" />
 		<group name="wasappusers">

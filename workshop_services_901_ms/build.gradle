@@ -1,0 +1,45 @@
+buildscript {
+	ext {
+		cleanArchitectureVersion = '4.6.1'
+		springBootVersion = '4.1.1'
+		sonarVersion = '7.4.0.8496'
+		jacocoVersion = '0.8.15'
+		blockHoundVersion = '1.0.17.RELEASE'
+		pitestVersion = '1.19.0'
+		pitestHistoryVersion = '0.0.1'
+        lombokVersion = '1.18.46'
+	}
+}
+
+plugins {
+	id 'co.com.bancolombia.cleanArchitecture' version "${cleanArchitectureVersion}"
+	id 'org.springframework.boot' version "${springBootVersion}" apply false
+	id 'info.solidsoft.pitest' version "${pitestVersion}" apply false
+	id 'org.sonarqube' version "${sonarVersion}"
+	id 'jacoco'
+}
+
+sonar {
+    def modules = subprojects.projectDir.collect { "${it.toString().replace(project.projectDir.toString() + "/", "")}" }
+    properties {
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.modules", "${modules.join(',')}"
+        property "sonar.sources", "src,deployment,settings.gradle,main.gradle,build.gradle,${modules.collect { "${it}/build.gradle" }.join(',')}"
+        property "sonar.exclusions", "**/MainApplication.java,**/**.bin,**/deployment/**"
+        property "sonar.tests", "src/test"
+        property "sonar.java.binaries", "**/build/classes/java/main"
+        property "sonar.junit.reportsPath", "**/build/test-results/test"
+        property "sonar.java.coveragePlugin", "jacoco"
+        property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacocoMergedReport/jacocoMergedReport.xml"
+        property "sonar.pitest.reportPaths", "build/reports/pitest/mutations.xml"
+        property "sonar.externalIssuesReportPaths", "build/issues.json"
+    }
+}
+
+apply from: './main.gradle'
+
+cleanPlugin {
+    modelProps {
+        whitelistedDependencies = "slf4j-api"
+    }
+}

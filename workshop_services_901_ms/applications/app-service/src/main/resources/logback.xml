@@ -1,0 +1,35 @@
+<configuration>
+
+    <appender name="default" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p --- [%15.15t] %-30.30logger{39} :  %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="jsonConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"application":"${APP_NAME:-workshop_services_901_ms}",
+                "env": "${SERVICE_ENV:-local}",
+                "capacity": "${CAPACITY:-my-capacity}",
+                "bia": "${BIA:-false}",
+                "country": "${COUNTRY:-co}",
+                "serviceid": "${SERVICE_ID:-WKS901}"}</customFields>
+
+            <decorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                <defaultMask>**********</defaultMask>
+                <path>password</path>
+                <path>otp</path>
+                <path>token</path>
+                <path>idNumber</path>
+                <path>documentNumber</path>
+                <path>phoneNumber</path>
+                <path>numeroCelular</path>
+                <path>clientId</path>
+            </decorator>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="jsonConsoleAppender"/>
+    </root>
+</configuration>

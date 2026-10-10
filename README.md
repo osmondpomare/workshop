@@ -49,8 +49,12 @@ workshop/
 │   └── Dockerfile                     Multi-stage: Maven (JDK 8) → Open Liberty (Java 8)
 ├── infra/postgres/init.sql            Schema and parameters
 ├── infra/localstack/init-dynamodb.sh  Creates the DynamoDB table
+├── infra/localstack/init-sqs.sh       Creates the SQS queue BCO-NotifyReversal (migrated messaging)
 ├── requests/registerReversal.json     Sample request
-└── scripts/test-flow.sh               End-to-end smoke test
+├── scripts/test-flow.sh               End-to-end smoke test
+├── ai-toolkit/                        Migration kit: skills, steering, playbook, agents, MCP configs
+├── workshop_services_901_ms/          Migrated reference project (reactive Spring Boot, read-only)
+└── workshop_services_901_us_ms/       Empty target folder — migrated here during the workshop
 ```
 
 ## Tech stack
@@ -208,3 +212,31 @@ These are intentional legacy traits for the agents to work on:
 - AWS SDK for Java v1 (`AmazonDynamoDBClientBuilder`, `AttributeValue`) and configuration read with `System.getenv`
 - In-house libraries delivered only as jars: a custom tracer (`java.util.logging`) and an `HttpURLConnection` REST client with a properties-based service registry
 - `javax.*` namespaces, JAXB-style DTOs, BASIC auth defined in `web.xml`, and `ibm-web-bnd.xml`/`ibm-web-ext.xml` descriptors
+
+## Migrating to Spring Boot (the workshop)
+
+The workshop drives this legacy EAR through an AI-assisted migration to a modern **reactive Spring Boot** microservice (Spring WebFlux + Project Reactor) built on the Scaffold Clean Architecture. Three pieces support that flow:
+
+| Folder | Role | Notes |
+|---|---|---|
+| `ai-toolkit/` | Migration kit | Skills, steering rules, the 14-step playbook, pre-built agents, and MCP configs that an AI agent (Kiro CLI, Claude Code, or AWS Transform CLI) uses to perform the migration. See [`ai-toolkit/README.md`](ai-toolkit/README.md). |
+| `workshop_services_901_ms/` | Migrated reference project | The **already-migrated** result, provided **read-only** as a reference of the expected target. Reactive Spring Boot 4.x, Java 25, Gradle, Scaffold Clean Architecture. See [`workshop_services_901_ms/README.md`](workshop_services_901_ms/README.md). |
+| `workshop_services_901_us_ms/` | Workshop target | **Empty on purpose.** During the workshop the agent scaffolds and migrates the implementation into this folder. Compare your output against the reference project above. |
+
+### How it maps
+
+The legacy Java EE building blocks are migrated to reactive Spring Boot equivalents:
+
+| Legacy (Java EE) | Migrated (reactive Spring Boot) |
+|---|---|
+| `ReversalService` (JAX-RS) | `ReversalController` (WebFlux `@RestController`) |
+| `MdbNotifyReversalBean` (JMS MDB) | `SQSProcessor` (SQS listener) |
+| `RegisterReversalBean` / `QueryReversalBean` / `NotifyReversalBean` | `RegisterReversalUseCase` / `QueryReversalUseCase` / `NotifyReversalUseCase` |
+| `*JPAServiceIMPL` + `EntityManager` | R2DBC adapters (`ReversoAdapter`, `ParametroAdapter`) |
+| `ExchangeRateUtil` + `ServiceBroker` (`HttpURLConnection`) | `ExchangeRateAdapter` (`WebClient`) |
+| `DynamoDBUtil` (AWS SDK v1) | `ReversalEventAdapter` (AWS SDK v2 async) |
+| `GenericSendJMSMesssageBean` (JMS) | `SQSSender` (SQS async) |
+
+The messaging hop also changes transport: the legacy Liberty queue `BCO.NotifyReversal.Q` becomes the SQS queue `BCO-NotifyReversal` (provisioned on LocalStack by `infra/localstack/init-sqs.sh`).
+
+To run the migration playbook, follow [`ai-toolkit/README.md`](ai-toolkit/README.md); the end-to-end command sequence for the session is in [`execute-workshop.md`](execute-workshop.md).

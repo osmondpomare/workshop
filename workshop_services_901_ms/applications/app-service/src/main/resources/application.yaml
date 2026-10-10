@@ -1,0 +1,66 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: "workshop_services_901_ms"
+  devtools:
+    add-properties: false
+  profiles:
+    include: null
+adapters:
+  r2dbc:
+    host: "${DB_HOST:localhost}"
+    port: "${DB_PORT:5432}"
+    database: "${DB_NAME:workshop}"
+    schema: "${DB_SCHEMA:public}"
+    username: "${DB_USER:workshop}"
+    password: "${DB_PASSWORD:workshop}"
+adapter:
+  restconsumer:
+    timeout: "${EXCHANGE_RATE_TIMEOUT:10000}"
+    url: "${EXCHANGE_RATE_BASE_URL:https://open.er-api.com}"
+  sqs:
+    region: "${AWS_REGION:us-east-1}"
+    queue-url: "${NOTIFY_REVERSAL_QUEUE_URL:http://localhost:4566/000000000000/BCO-NotifyReversal}"
+    endpoint: "${SQS_ENDPOINT:http://localhost:4566}"
+aws:
+  region: "${AWS_REGION:us-east-1}"
+  accessKeyId: "${AWS_ACCESS_KEY_ID:}"
+  secretAccessKey: "${AWS_SECRET_ACCESS_KEY:}"
+  dynamodb:
+    endpoint: "${DYNAMO_ENDPOINT:http://localhost:4566}"
+    reversal-table: "${DYNAMO_REVERSAL_TABLE:BCO_REVERSAL_EVENTS}"
+entrypoint:
+  sqs:
+    region: "${AWS_REGION:us-east-1}"
+    endpoint: "${SQS_ENDPOINT:http://localhost:4566}"
+    queue-url: "${NOTIFY_REVERSAL_QUEUE_URL:http://localhost:4566/000000000000/BCO-NotifyReversal}"
+    wait-time-seconds: "${SQS_WAIT_TIME_SECONDS:20}"
+    max-number-of-messages: "${SQS_MAX_MESSAGES:10}"
+    visibility-timeout-seconds: "${SQS_VISIBILITY_TIMEOUT_SECONDS:30}"
+    number-of-threads: "${SQS_THREADS:1}"
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  info:
+    env:
+      enabled: true
+info:
+  app:
+    name: "workshop_services_901_ms"
+    description: "Reversal (backout) services migrated to Spring Boot WebFlux"
+cors:
+  allowed-origins: "http://localhost:4200,http://localhost:8080"
+springdoc:
+  api-docs:
+    enabled: true
+    path: /api-spec
+  swagger-ui:
+    enabled: false

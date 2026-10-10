@@ -22,13 +22,14 @@ services:
     image: localstack/localstack:4.4.0
     container_name: wks-localstack
     environment:
-      SERVICES: dynamodb
+      SERVICES: dynamodb,sqs
       AWS_DEFAULT_REGION: us-east-1
       LOCALSTACK_AUTH_TOKEN: ${LOCALSTACK_AUTH_TOKEN:-}
     ports:
       - "4566:4566"
     volumes:
       - ./infra/localstack/init-dynamodb.sh:/etc/localstack/init/ready.d/init-dynamodb.sh:ro
+      - ./infra/localstack/init-sqs.sh:/etc/localstack/init/ready.d/init-sqs.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "awslocal dynamodb describe-table --table-name BCO_REVERSAL_EVENTS --region us-east-1 > /dev/null"]
       interval: 5s

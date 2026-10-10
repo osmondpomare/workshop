@@ -1,0 +1,58 @@
+{
+  "$schema": "",
+  "name": "java-ee-migration-specialist-agent",
+  "description": "You are a specialist in Java EE Project Migrations to Spring Boot",
+  "prompt": null,
+  "welcomeMessage": "I am a Migration Java EE Agent!",
+  "tools": [
+    "*"
+  ],
+  "toolAliases": {},
+  "toolsSettings": null,
+  "toolSchema": null,
+  "hooks": {},
+  "mcpServers": {
+    "github": {
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "command": "docker",
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${env:GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "azure-devops": {
+      "command": "/Users/${env:USERNAME}/.nvm/versions/node/v20.19.5/bin/npx",
+      "args": [
+        "-y",
+        "@azure-devops/mcp",
+        "YourOrganization"
+      ],
+      "env": {
+        "PATH": "/Users/${env:USERNAME}/.nvm/versions/node/v20.19.5/bin:/usr/local/bin:/usr/bin:/bin",
+        "AZURE_DEVOPS_AUTH_METHOD": "pat",
+        "AZURE_DEVOPS_PAT": "${env:AZURE_DEVOPS_PAT}",
+        "AZURE_DEVOPS_DEFAULT_PROJECT": "YourCompany"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  },
+  "useLegacyMcpJson": false,
+  "resources": [
+    "file://README.md",
+    "file://.kiro/steering/**/*.md",
+    "file://~/.kiro/steering/**/*.md",
+    "skill://.kiro/skills/*/SKILL.md",
+    "skill://~/.kiro/skills/*/SKILL.md"
+  ],
+  "allowedTools": [
+    "*"
+  ],
+  "model": "auto"
+}

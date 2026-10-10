@@ -403,7 +403,7 @@ dependencies {
 package co.com.company.r2dbc.adapter;
 
 import co.com.company.model.balance.Balance;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import io.r2dbc.spi.Row;
 import io.r2dbc.spi.RowMetadata;
 import org.junit.jupiter.api.BeforeEach;
@@ -568,7 +568,7 @@ package co.com.company.consumer.adapter;
 
 import co.com.company.model.authentication.*;
 import co.com.company.model.exceptions.TechnicalException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -1565,6 +1565,12 @@ AuthenticationResult.builder()
 After writing tests, verify:
 
 - [ ] All tests pass: `./gradlew test`
+- [ ] **Spring context starts: `./gradlew :app-service:bootRun` reaches `Started MainApplication`.**
+  `./gradlew test` and `build -x test` compile and run slice tests but do NOT boot the full
+  `app-service` context, so they never catch bean-wiring errors (duplicate bean names, missing
+  `WebClient.Builder`, missing `ObjectMapper`, Spring-Boot-3-only libraries like
+  `resilience4j-spring-boot3`). Always run `bootRun` once as the final verification; stop it after
+  the `Started MainApplication` log line.
 - [ ] No `.block()` calls in test assertions (use StepVerifier)
 - [ ] No `@MockBean` usage (replaced with `@MockitoBean`, and only in the one tagged integration test that needs it)
 - [ ] No `MockMvc` usage (replaced with WebTestClient)

@@ -153,6 +153,17 @@ This generates the base structure under `infrastructure/entry-points/sqs-listene
 - Base package structure
 - Placeholder configuration class
 
+> **Post-scaffolding fixes (Spring Boot 4.x — apply before running the app):**
+> 1. **Rename the `SqsAsyncClient` `@Bean` method.** The generator emits a `@Bean public SqsAsyncClient configSqs(...)`
+>    in the listener's `SQSConfig` AND (if an SQS sender driven-adapter is also generated) an identical
+>    `configSqs` in `SQSSenderConfig`. Two beans named `configSqs` → startup failure
+>    (`A bean with that name has already been defined`). Rename them to `listenerSqsAsyncClient` and
+>    `senderSqsAsyncClient` and inject each with `@Qualifier`.
+> 2. **Fix the Jackson package.** If the generated `SQSProcessor`/`SQSSender` import
+>    `com.fasterxml.jackson.databind.ObjectMapper`, rewrite to `tools.jackson.databind.ObjectMapper`
+>    and expose it as an explicit `@Bean("sqsObjectMapper")` injected via `@Qualifier`
+>    (Boot 4.x does not auto-configure the Jackson 2 `ObjectMapper`).
+
 After scaffolding, implement the components described in sections 8–11.
 
 ---
@@ -1123,6 +1134,7 @@ log.info("Message processed successfully",
 | 12 | No blocking calls | Verify with BlockHound (no `block()` calls in reactive chain) |
 | 13 | Memory stable under load | No OOM after sustained message throughput |
 | 14 | LocalStack tests pass | Integration tests with Testcontainers succeed |
+| 15 | Spring context starts | `./gradlew :app-service:bootRun` reaches `Started MainApplication` (NOT just `build -x test`, which never detects bean-wiring/name-collision errors) |
 
 ---
 
@@ -1136,6 +1148,20 @@ log.info("Message processed successfully",
 - **MUST** use `onErrorContinue` in the polling loop to prevent single-message failures from crashing the listener
 - **MUST** keep business logic in domain use cases, not in the processor
 - **MUST** use constructor injection (never field injection with `@Autowired`)
+- **MUST** give the `SqsAsyncClient` `@Bean` a **unique method name per module** whenever a project
+  has BOTH an SQS listener (entry-point) and an SQS sender (driven-adapter) in the same application
+  context (e.g. `listenerSqsAsyncClient` / `senderSqsAsyncClient`). The scaffold generators emit a
+  method literally named `configSqs` in BOTH the entry-point `SQSConfig` and the driven-adapter
+  `SQSSenderConfig`; left unchanged they produce two beans with the same name `configSqs` and the
+  app fails to start with `A bean with that name has already been defined ... overriding is disabled`.
+  After renaming, inject each client with `@Qualifier("...SqsAsyncClient")` so there is no
+  by-type ambiguity between the two `SqsAsyncClient` beans.
+- **MUST** provide the `ObjectMapper` used by the processor/sender as an explicit `@Bean`
+  (e.g. `@Bean("sqsObjectMapper") tools.jackson.databind.ObjectMapper`) and inject it with
+  `@Qualifier`, instead of relying on auto-configuration. Use the Jackson 3 package
+  `tools.jackson.databind.ObjectMapper` — NOT `com.fasterxml.jackson.databind.ObjectMapper`
+  (Jackson 2 is not auto-configured as a bean in Spring Boot 4.x). If the scaffold-generated code
+  imports `com.fasterxml.jackson.*`, rewrite it to `tools.jackson.*`.
 
 ### MUST NOT
 

@@ -617,8 +617,7 @@ import java.util.concurrent.TimeUnit;
 public class CustomerWebClientConfig {
 
     @Bean(name = "customerWebClient")
-    public WebClient customerWebClient(WebClient.Builder builder,
-                                        @Value("${adapter.webclient.customer.host}") String host,
+    public WebClient customerWebClient(@Value("${adapter.webclient.customer.host}") String host,
                                         @Value("${adapter.webclient.customer.connection-timeout}") int connectionTimeout,
                                         @Value("${adapter.webclient.customer.read-timeout}") int readTimeout) {
         ConnectionProvider provider = ConnectionProvider.builder("customer")
@@ -635,7 +634,9 @@ public class CustomerWebClientConfig {
                 conn.addHandlerLast(new WriteTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
             });
 
-        return builder
+        // Use WebClient.builder() directly — do NOT inject a WebClient.Builder bean (often absent in
+        // the Clean Architecture app-service, causing a startup failure).
+        return WebClient.builder()
             .baseUrl(host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(new ReactorClientHttpConnector(httpClient))
@@ -1378,8 +1379,7 @@ import java.util.concurrent.TimeUnit;
 public class ApiGatewayWebClientConfig {
 
     @Bean(name = "gatewayWebClient")
-    public WebClient gatewayWebClient(WebClient.Builder builder,
-                                       @Value("${adapter.webclient.api-gateway.host}") String host,
+    public WebClient gatewayWebClient(@Value("${adapter.webclient.api-gateway.host}") String host,
                                        @Value("${adapter.webclient.api-gateway.connection-timeout}") int connectionTimeout,
                                        @Value("${adapter.webclient.api-gateway.read-timeout}") int readTimeout) {
         ConnectionProvider provider = ConnectionProvider.builder("api-gateway")
@@ -1396,7 +1396,9 @@ public class ApiGatewayWebClientConfig {
                 conn.addHandlerLast(new WriteTimeoutHandler(readTimeout, TimeUnit.MILLISECONDS));
             });
 
-        return builder
+        // Use WebClient.builder() directly — do NOT inject a WebClient.Builder bean (often absent in
+        // the Clean Architecture app-service, causing a startup failure).
+        return WebClient.builder()
             .baseUrl(host)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(new ReactorClientHttpConnector(httpClient))

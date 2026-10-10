@@ -931,8 +931,10 @@ dependencies {
     // Jakarta Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // Resilience4j
-    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.3.0'
+    // Resilience4j (Spring Boot 4.x — do NOT use resilience4j-spring-boot3, it fails at startup with
+    // "Module 'io.github.resilience4j:resilience4j-spring-boot3' is only compatible with Spring Boot 3.x").
+    // Only add these if the controller actually uses @CircuitBreaker; otherwise omit them entirely.
+    implementation 'io.github.resilience4j:resilience4j-spring-boot4:2.4.0'
     implementation 'io.github.resilience4j:resilience4j-reactor:2.3.0'
 
     // MapStruct

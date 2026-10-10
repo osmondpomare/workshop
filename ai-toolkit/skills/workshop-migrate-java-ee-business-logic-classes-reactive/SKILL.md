@@ -215,8 +215,7 @@ public class RestConsumerConfig {
     }
 
     @Bean(name = "balanceWebClient")
-    public WebClient balanceWebClient(WebClient.Builder builder,
-                                       BalanceProperties properties) {
+    public WebClient balanceWebClient(BalanceProperties properties) {
         ConnectionProvider provider = ConnectionProvider.builder("balance")
             .pendingAcquireTimeout(Duration.ofMillis(properties.getPendingAcquireTimeout()))
             .maxConnections(properties.getMaxConnections())
@@ -233,7 +232,10 @@ public class RestConsumerConfig {
                     conn.addHandlerLast(new WriteTimeoutHandler(properties.getReadTimeout(), MILLISECONDS));
                 }));
 
-        return builder
+        // Use WebClient.builder() directly — do NOT inject a WebClient.Builder bean. In a Clean
+        // Architecture app-service the auto-configured WebClient.Builder is often absent, which
+        // fails startup with "required a bean of type 'WebClient$Builder' that could not be found".
+        return WebClient.builder()
             .baseUrl(properties.getHost())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .clientConnector(connector)

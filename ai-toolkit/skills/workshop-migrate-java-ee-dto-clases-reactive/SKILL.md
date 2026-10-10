@@ -251,7 +251,7 @@ public class DocumentValidationRQ implements Serializable {
 ```java
 package com.company.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import tools.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 

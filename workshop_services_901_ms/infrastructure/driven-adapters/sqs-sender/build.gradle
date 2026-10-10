@@ -1,0 +1,7 @@
+dependencies {
+    implementation project(':model')
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.apache.logging.log4j:log4j-api'
+    implementation 'software.amazon.awssdk:sqs'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+}

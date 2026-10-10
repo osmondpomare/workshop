@@ -30,8 +30,8 @@ public class RestConsumerConfig {
     }
 
     @Bean(name = "exchangeRateWebClient")
-    public WebClient exchangeRateWebClient(WebClient.Builder builder) {
-        return builder
+    public WebClient exchangeRateWebClient() {
+        return WebClient.builder()
                 .baseUrl(url)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .clientConnector(getClientHttpConnector())

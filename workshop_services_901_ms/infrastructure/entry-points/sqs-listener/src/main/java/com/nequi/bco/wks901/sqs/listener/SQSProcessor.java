@@ -3,8 +3,8 @@ package com.nequi.bco.wks901.sqs.listener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nequi.bco.wks901.model.reversal.ReversalNotification;
 import com.nequi.bco.wks901.usecase.notifyreversal.NotifyReversalUseCase;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -18,11 +18,16 @@ import java.util.function.Function;
  */
 @Service
 @Log4j2
-@RequiredArgsConstructor
 public class SQSProcessor implements Function<Message, Mono<Void>> {
 
     private final NotifyReversalUseCase notifyReversalUseCase;
     private final ObjectMapper objectMapper;
+
+    public SQSProcessor(NotifyReversalUseCase notifyReversalUseCase,
+                        @Qualifier("sqsObjectMapper") ObjectMapper objectMapper) {
+        this.notifyReversalUseCase = notifyReversalUseCase;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public Mono<Void> apply(Message message) {

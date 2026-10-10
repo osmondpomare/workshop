@@ -28,7 +28,7 @@ aws:
   accessKeyId: "${AWS_ACCESS_KEY_ID:}"
   secretAccessKey: "${AWS_SECRET_ACCESS_KEY:}"
   dynamodb:
-    endpoint: "${DYNAMO_ENDPOINT:}"
+    endpoint: "${DYNAMO_ENDPOINT:http://localhost:4566}"
     reversal-table: "${DYNAMO_REVERSAL_TABLE:BCO_REVERSAL_EVENTS}"
 entrypoint:
   sqs:
@@ -49,9 +49,6 @@ management:
       probes:
         enabled: true
       show-details: always
-  health:
-    circuitbreakers:
-      enabled: true
   info:
     env:
       enabled: true

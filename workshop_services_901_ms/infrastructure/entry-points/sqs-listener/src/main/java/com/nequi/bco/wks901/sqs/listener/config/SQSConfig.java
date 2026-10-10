@@ -1,6 +1,7 @@
 package com.nequi.bco.wks901.sqs.listener.config;
 
 import com.nequi.bco.wks901.sqs.listener.helper.SQSListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Mono;
@@ -23,7 +24,8 @@ import java.util.function.Function;
 public class SQSConfig {
 
     @Bean
-    public SQSListener sqsListener(SqsAsyncClient client, SQSProperties properties, Function<Message, Mono<Void>> fn) {
+    public SQSListener sqsListener(@Qualifier("listenerSqsAsyncClient") SqsAsyncClient client,
+                                   SQSProperties properties, Function<Message, Mono<Void>> fn) {
         return SQSListener.builder()
                 .client(client)
                 .properties(properties)
@@ -33,7 +35,7 @@ public class SQSConfig {
     }
 
     @Bean
-    public SqsAsyncClient configSqs(SQSProperties properties, MetricPublisher publisher) {
+    public SqsAsyncClient listenerSqsAsyncClient(SQSProperties properties, MetricPublisher publisher) {
         return SqsAsyncClient.builder()
                 .endpointOverride(resolveEndpoint(properties))
                 .region(Region.of(properties.region()))

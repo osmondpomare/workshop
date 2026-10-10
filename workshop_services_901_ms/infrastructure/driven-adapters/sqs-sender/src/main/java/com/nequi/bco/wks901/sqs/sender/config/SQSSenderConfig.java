@@ -3,6 +3,7 @@ package com.nequi.bco.wks901.sqs.sender.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nequi.bco.wks901.model.reversal.gateways.ReversalNotificationGateway;
 import com.nequi.bco.wks901.sqs.sender.SQSSender;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,14 +25,19 @@ public class SQSSenderConfig {
 
     @Bean
     public ReversalNotificationGateway reversalNotificationGateway(SQSSenderProperties properties,
-                                                                   SqsAsyncClient sqsAsyncClient,
-                                                                   ObjectMapper objectMapper) {
+                                                                   @Qualifier("senderSqsAsyncClient") SqsAsyncClient sqsAsyncClient,
+                                                                   @Qualifier("sqsObjectMapper") ObjectMapper objectMapper) {
         return new SQSSender(properties, sqsAsyncClient, objectMapper);
     }
 
+    @Bean(name = "sqsObjectMapper")
+    @ConditionalOnMissingBean(name = "sqsObjectMapper")
+    public ObjectMapper sqsObjectMapper() {
+        return new ObjectMapper();
+    }
+
     @Bean
-    @ConditionalOnMissingBean(SqsAsyncClient.class)
-    public SqsAsyncClient configSqs(SQSSenderProperties properties, MetricPublisher publisher) {
+    public SqsAsyncClient senderSqsAsyncClient(SQSSenderProperties properties, MetricPublisher publisher) {
         return SqsAsyncClient.builder()
                 .endpointOverride(resolveEndpoint(properties))
                 .region(Region.of(properties.region()))

@@ -41,14 +41,14 @@ class SQSConfigTest {
     @Test
     void configSqsIsNotNull() {
         var loggingMetricPublisher = LoggingMetricPublisher.create();
-        assertThat(sqsConfig.configSqs(sqsProperties, loggingMetricPublisher)).isNotNull();
+        assertThat(sqsConfig.listenerSqsAsyncClient(sqsProperties, loggingMetricPublisher)).isNotNull();
     }
 
     @Test
     void configSqsWhenEndpointIsNotNull() {
         var loggingMetricPublisher = LoggingMetricPublisher.create();
         when(sqsProperties.endpoint()).thenReturn("http://localhost:4566");
-        assertThat(sqsConfig.configSqs(sqsProperties, loggingMetricPublisher)).isNotNull();
+        assertThat(sqsConfig.listenerSqsAsyncClient(sqsProperties, loggingMetricPublisher)).isNotNull();
     }
 
     @Test

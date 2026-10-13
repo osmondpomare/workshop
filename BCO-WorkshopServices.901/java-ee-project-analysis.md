@@ -11,7 +11,7 @@ Exchange Rate service, persists the reversal in PostgreSQL (JPA), writes an audi
 and emits a JMS notification. The MDB consumer updates the reversal state and the DynamoDB event
 status, with bounded JMS redelivery. Modules: **MEL** (DTOs/JAXB), **JPA** (entities + persistence
 services), **SEC** (EJB business beans, utilities, JMS), **SEF** (JAX-RS facade WAR), **EAR**
-(assembly). Cross-cutting middleware (`com.nequi.mdw.common`) provides logging (TracerManager) and a
+(assembly). Cross-cutting middleware (`org.bintec.mdw.common`) provides logging (TracerManager) and a
 service consumer broker (ServiceConsumer). The target of migration is Spring Boot 4.1.x reactive
 (WebFlux) on Java 25 using Clean Architecture.
 
@@ -104,19 +104,19 @@ All under `BCO.WKS.901.MEL/.../mel/services/reversal/` (JAXB `@XmlType`, Jackson
   - DTOs: all MEL `services/reversal/*` listed above.
   - Business Logic: `RegisterReversalBean`, `QueryReversalBean`, `NotifyReversalBean`, `ReversoPersistenceBean`, `GenericSendJMSMesssageBean`.
   - Entry Points: `ReversalService` (JAX-RS), `MdbNotifyReversalBean` (JMS).
-  - Suggested target package: `com.nequi.bco.wks901.reversal` (Clean Architecture modules: `domain/model`, `domain/usecase`, `infrastructure/entry-points`, `infrastructure/driven-adapters`).
+  - Suggested target package: `org.bintec.bco.wks901.reversal` (Clean Architecture modules: `domain/model`, `domain/usecase`, `infrastructure/entry-points`, `infrastructure/driven-adapters`).
 - **shared/common**: `ConstantWKS901`, `ConstantJPA`, `ResponseBuilderUtil`, `MessageTracerUtil`, exceptions.
 
 ## Cross-cutting and External Libraries
 
 ```xml
 <dependency>
-  <groupId>com.nequi.mdw.common</groupId>
+  <groupId>org.bintec.mdw.common</groupId>
   <artifactId>MDW.CMM.TracerManager</artifactId>
   <version>1.0.0</version>
 </dependency>
 <dependency>
-  <groupId>com.nequi.mdw.common</groupId>
+  <groupId>org.bintec.mdw.common</groupId>
   <artifactId>MDW.CMM.ServiceConsumer</artifactId>
   <version>1.0.0</version>
 </dependency>
@@ -139,7 +139,7 @@ All under `BCO.WKS.901.MEL/.../mel/services/reversal/` (JAXB `@XmlType`, Jackson
   <scope>provided</scope>
 </dependency>
 ```
-- `MDW.CMM.TracerManager`: `com.nequi.mdw.common.tracer.service.{GenericLogger, LoggerFactory, ServiceTypeEnum}`, `tracer.util.TypeEnum`.
+- `MDW.CMM.TracerManager`: `org.bintec.mdw.common.tracer.service.{GenericLogger, LoggerFactory, ServiceTypeEnum}`, `tracer.util.TypeEnum`.
 - `MDW.CMM.ServiceConsumer`: `consumer.broker.ServiceBroker`, `consumer.util.{UtilJSON, CommonServiceConsumerUtil}`, `consumer.exception.{CommonUtilException, ServiceConsumerException}`.
 - PostgreSQL JDBC `org.postgresql:postgresql:42.7.4` (copied in Dockerfile).
 
@@ -241,9 +241,9 @@ Other environment variables referenced in code/config: `CURRENT_USER` (default `
 
 ## Project Parameters
 
-- **groupId**: `com.nequi`
+- **groupId**: `org.bintec`
 - **artifactId**: `BCO.WKS.901` (parent/aggregator; modules `BCO.WKS.901.{MEL,JPA,SEC,SEF,EAR}`)
-- **packageName**: `com.nequi.bco.wks901`
+- **packageName**: `org.bintec.bco.wks901`
 
 ## DevOps Pipelines Config
 

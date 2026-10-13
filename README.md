@@ -31,7 +31,8 @@ Every layer traces JSON lines through `MDW.CMM.TracerManager` (`LoggerFactory.ge
 
 ```
 workshop/
-├── docker-compose.yml                 PostgreSQL + LocalStack + Open Liberty app
+├── docker-compose.yml                 PostgreSQL + LocalStack + Open Liberty app (pulls osmondpomare/bco-workshop-services-901:1.0.0)
+├── docker-compose.build.yml           Override to build the app image from source instead of pulling it
 ├── libs/repository/                   File-based Maven repo with the compiled common jars
 ├── MDW-COMMON.WKS/                    Sources of the common libraries (to rebuild the jars)
 │   ├── MDW.CMM.TracerManager          LoggerFactory, GenericLogger, ServiceTypeEnum, TypeEnum (java.util.logging)
@@ -73,17 +74,17 @@ workshop/
 ## Prerequisites
 
 - Docker with Docker Compose v2
-- Internet access while building (Maven Central, `icr.io`, Docker Hub) and at runtime (the public exchange-rate API)
-- Optional for local builds: JDK 8 and Maven 3.8+
+- Internet access to pull images from Docker Hub, plus at runtime (the public exchange-rate API)
+- Optional, only needed to build the app image from source instead of pulling it: JDK 8, Maven 3.8+, and internet access to Maven Central and `icr.io` (see [Building from source instead of pulling](#building-from-source-instead-of-pulling))
 
 ## Run it
 
 ```bash
 cd workshop
-docker compose up --build
+docker compose up
 ```
 
-The first build downloads Maven dependencies and the Liberty image, so it takes a few minutes. The app is ready when the Liberty log shows:
+By default `bco-wks-901` pulls the pre-built image `osmondpomare/bco-workshop-services-901:1.0.0` from Docker Hub — no JDK or Maven required. The first run downloads the image plus the Postgres/LocalStack images, so it takes a few minutes. The app is ready when the Liberty log shows:
 
 ```
 CWWKZ0001I: Application BCO.WorkshopServices.901 started
@@ -95,6 +96,17 @@ To stop everything and remove the data:
 ```bash
 docker compose down -v
 ```
+
+### Building from source instead of pulling
+
+If you change the Java code under `BCO-WorkshopServices.901` or the common libraries, rebuild the image locally with the build override instead of pulling the published one:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.build.yml build bco-wks-901
+docker compose -f docker-compose.yml -f docker-compose.build.yml up
+```
+
+This requires JDK 8 and Maven, plus internet access to Maven Central, `icr.io` (Open Liberty base image) and Docker Hub.
 
 ## Try it
 
@@ -173,7 +185,7 @@ Business parameters live in the `PARAMETRO` table: `BCO_WKS901_MONEDA_DESTINO` (
 
 ## Common libraries (compiled jars)
 
-The application resolves `MDW.CMM.TracerManager:1.0.0` and `MDW.CMM.ServiceConsumer:1.0.0` (groupId `com.nequi.mdw.common`) from the file repository `libs/repository`, declared in the SEC, SEF and EAR POMs. The jars are already compiled for Java 8 (class file version 52), so no build step is needed.
+The application resolves `MDW.CMM.TracerManager:1.0.0` and `MDW.CMM.ServiceConsumer:1.0.0` (groupId `org.bintec.mdw.common`) from the file repository `libs/repository`, declared in the SEC, SEF and EAR POMs. The jars are already compiled for Java 8 (class file version 52), so no build step is needed.
 
 To change and republish them (JDK 8+ and Maven required):
 

@@ -4,11 +4,11 @@
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 	<display-name>BCO.WKS.901.SEF</display-name>
 	<servlet>
-		<servlet-name>com.nequi.bco.wks901.sef.config.ConfigServices</servlet-name>
+		<servlet-name>org.bintec.bco.wks901.sef.config.ConfigServices</servlet-name>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>com.nequi.bco.wks901.sef.config.ConfigServices</servlet-name>
+		<servlet-name>org.bintec.bco.wks901.sef.config.ConfigServices</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
 	<security-constraint>

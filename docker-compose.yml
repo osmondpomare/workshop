@@ -37,10 +37,7 @@ services:
       retries: 30
 
   bco-wks-901:
-    build:
-      context: .
-      dockerfile: BCO-WorkshopServices.901/Dockerfile
-    image: bco-workshop-services-901:1.0.0
+    image: osmondpomare/bco-workshop-services-901:1.0.0
     container_name: wks-bco-901
     environment:
       DB_HOST: postgres

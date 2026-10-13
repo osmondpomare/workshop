@@ -1,0 +1,16 @@
+name: workshop-bintec
+
+# Override used to build the app image from source instead of pulling it from
+# Docker Hub. Only needed when changing the Java code under BCO-WorkshopServices.901
+# (requires internet access to Maven Central / icr.io during the build).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml build bco-wks-901
+#   docker compose -f docker-compose.yml -f docker-compose.build.yml up
+
+services:
+  bco-wks-901:
+    build:
+      context: .
+      dockerfile: BCO-WorkshopServices.901/Dockerfile
+    image: bco-workshop-services-901:1.0.0

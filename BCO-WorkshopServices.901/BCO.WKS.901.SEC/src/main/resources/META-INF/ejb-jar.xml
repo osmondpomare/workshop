@@ -8,7 +8,7 @@
 		<session>
 			<ejb-name>GenericSendJMSMesssageBean</ejb-name>
 			<local-bean />
-			<ejb-class>com.nequi.bco.wks901.sec.bean.GenericSendJMSMesssageBean</ejb-class>
+			<ejb-class>org.bintec.bco.wks901.sec.bean.GenericSendJMSMesssageBean</ejb-class>
 			<session-type>Stateless</session-type>
 			<transaction-type>Container</transaction-type>
 			<resource-ref>

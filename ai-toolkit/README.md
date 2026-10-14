@@ -43,9 +43,9 @@ AI coding agent (Kiro CLI, Claude Code, or AWS Transform CLI) through the migrat
 
 ```
 ai-toolkit/
-├── install-toolkit.sh                  # Install skills + steering (kiro | claude | atx)
-├── install-mcp.sh                      # Install MCP servers (kiro | claude | atx | all)
-├── install-agents.sh                   # Install agent configs (kiro)
+├── install-toolkit.sh / .ps1           # Install skills + steering (kiro | claude | atx)
+├── install-mcp.sh     / .ps1           # Install MCP servers (kiro | claude | atx | all)
+├── install-agents.sh  / .ps1           # Install agent configs (kiro)
 ├── agents/
 │   └── java-ee-migration-specialist-agent.json
 ├── skills/                             # 13 workshop-* skills (SKILL.md each)
@@ -96,6 +96,15 @@ ai-toolkit/
 ./install-toolkit.sh atx      # → ~/.aws/atx/skills/ (AWS Transform CLI)
 ```
 
+On **Windows**, use the PowerShell equivalent (`install-toolkit.ps1`). You may first need to allow script execution for the current session:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\install-toolkit.ps1 kiro     # → %USERPROFILE%\.kiro\skills\ and %USERPROFILE%\.kiro\steering\
+.\install-toolkit.ps1 claude   # → %USERPROFILE%\.claude\ (CLAUDE.md + commands)
+.\install-toolkit.ps1 atx      # → %USERPROFILE%\.aws\atx\skills\ (AWS Transform CLI)
+```
+
 Running it with no argument (or an unknown one) prints the usage help.
 
 ### 2. Verify
@@ -122,8 +131,19 @@ already present):
 ./install-mcp.sh all      # → all of the above
 ```
 
-**Requirements:** `jq`, and `npx` (Node.js 20+, preferably via nvm). Docker Desktop is required for
-the GitHub MCP server (it runs as a container).
+On **Windows**, use `install-mcp.ps1` (native PowerShell JSON handling — `jq` is **not** required):
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\install-mcp.ps1 kiro     # → %USERPROFILE%\.kiro\settings\mcp.json
+.\install-mcp.ps1 claude   # → %USERPROFILE%\.claude.json
+.\install-mcp.ps1 atx      # → %USERPROFILE%\.aws\atx\mcp.json
+.\install-mcp.ps1 all      # → all of the above
+```
+
+**Requirements:** `jq` (bash only — the PowerShell version uses built-in JSON support), and `npx`
+(Node.js 20+, preferably via nvm). Docker Desktop is required for the GitHub MCP server (it runs as
+a container).
 
 ### Required tokens
 
@@ -132,6 +152,16 @@ Export the Personal Access Tokens the servers need before running the script:
 ```bash
 export GITHUB_PERSONAL_ACCESS_TOKEN="your-token-here"
 export AZURE_DEVOPS_PAT="your-token-here"
+```
+
+On **Windows PowerShell**, set them for the current session (and optionally persist them at user scope):
+
+```powershell
+$env:GITHUB_PERSONAL_ACCESS_TOKEN = "your-token-here"
+$env:AZURE_DEVOPS_PAT = "your-token-here"
+# Persist across sessions (optional):
+[Environment]::SetEnvironmentVariable("GITHUB_PERSONAL_ACCESS_TOKEN", "your-token-here", "User")
+[Environment]::SetEnvironmentVariable("AZURE_DEVOPS_PAT", "your-token-here", "User")
 ```
 
 Detailed provider setup (token scopes, verification) is in:
@@ -147,6 +177,13 @@ global agents directory:
 
 ```bash
 ./install-agents.sh kiro      # → ~/.kiro/agents/
+```
+
+On **Windows**, use `install-agents.ps1`:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\install-agents.ps1 kiro     # → %USERPROFILE%\.kiro\agents\
 ```
 
 Then list or use them:
